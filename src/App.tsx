@@ -67,10 +67,11 @@ function App() {
   
     const fetchNews = React.useCallback((pageNum: number = 1) => {
       setLoading(true);
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://115.159.44.226:3000';
       // 根据 viewMode 选择不同的 API 端点和参数
       const apiUrl = viewMode === 'timeline'
-      ? `http://115.159.44.226:3000/api/news?page=${pageNum}`
-      : `http://115.159.44.226:3000/api/news/important?page=${pageNum}&minScore=70&orderBy=time`;
+        ? `${baseUrl}/api/news?page=${pageNum}`
+        : `${baseUrl}/api/news/important?page=${pageNum}&minScore=70&orderBy=time`;
   
       fetch(apiUrl)
         .then(res => res.json())

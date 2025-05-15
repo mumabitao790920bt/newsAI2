@@ -18,3 +18,78 @@
 1. 先启动前端服务器（网页界面）
 2. 再启动后端服务器（数据接口）
 两个服务器都需要运行，网页才能正常工作。你现在两个服务器都启动了吗？
+
+
+- 添加修改的文件到暂存区：
+
+bash
+
+运行
+
+Open Folder
+
+1
+
+git add App.tsx
+
+或添加所有更改：
+
+bash
+
+运行
+
+Open Folder
+
+1
+
+git add .
+- 提交更改：
+
+bash
+
+运行
+
+Open Folder
+
+1
+
+git commit -m "更新CORS配置，添加Cloudflare Pages域名支持"
+- 推送到远程仓库：
+
+bash
+
+运行
+
+Open Folder
+
+1
+
+项目构建方面的命令
+
+- 建议解决步骤：
+
+a. 首先确保项目能正确构建：
+
+bash
+
+运行
+
+Open Folder
+
+1
+
+npm run build
+
+b. 检查 Cloudflare Pages 的部署设置：
+
+- 构建命令应该设置为： npm run build
+- 构建输出目录应该设置为： dist
+- Node.js 版本建议选择：18.x 或更高版本
+c. 在 Cloudflare Pages 的部署设置中添加环境变量（如果你的项目需要的话）：
+
+- 检查 `.env` 文件中的环境变量
+- 将必要的环境变量添加到 Cloudflare Pages 的环境变量设置中
+- 其他建议：
+
+- 检查 `netlify.toml` 文件的配置是否正确
+- 确保 `public/_redirects` 文件包含正确的路由规则
