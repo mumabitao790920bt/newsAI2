@@ -46,7 +46,7 @@ async function testConnection() {
     console.log('Database connection successful');
     connection.release();
     return true;
-  } catch (err) {
+  } catch (err: any) {  // 添加类型断言
     console.error('Database connection failed:', {
       message: err.message,
       code: err.code,
