@@ -25,7 +25,7 @@ interface NewsItem {
 }
 
 // Worker API URL
-const WORKER_URL = "https://news-timeline-clone.mumabitao790920bt.workers.dev";
+const WORKER_URL = "https://news-timeline-clone.16318015.workers.dev";
 
 function App() {
   const [newsList, setNewsList] = React.useState<NewsItem[]>([]);
