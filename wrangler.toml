@@ -5,3 +5,8 @@ main = "./worker.js"
 
 [site]
 bucket = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "news-database"
+database_id = "652398e7-8b25-4875-9b37-ff5b54d5c716"

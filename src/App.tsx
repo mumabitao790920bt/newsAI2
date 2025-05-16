@@ -67,14 +67,18 @@ function App() {
   
     const fetchNews = React.useCallback((pageNum: number = 1) => {
       setLoading(true);
-      // 根据 viewMode 选择不同的 API 端点和参数
-      const apiUrl = viewMode === 'timeline'
-      ? `//115.159.44.226:3000/api/news?page=${pageNum}`
-      : `//115.159.44.226:3000/api/news/important?page=${pageNum}&minScore=70&orderBy=time`;
+      // 使用 Cloudflare Worker API 端点
+      const apiUrl = `/api/news?page=${pageNum}`;
   
       fetch(apiUrl)
         .then(res => res.json())
-        .then((data: NewsItem[]) => {
+        .then((response) => {
+          if (!response.success) {
+            throw new Error(response.error || '获取新闻失败');
+          }
+          
+          const newsData = response.data;
+          
           const processNews = (news: NewsItem) => {
             const dateStr = news.real_pub_date || news.pub_date;
             const date = new Date(dateStr);
@@ -98,14 +102,14 @@ function App() {
               score: news.news_pingfen || 0,
               pc_url: news.pc_url || '#',
               market_analysis: news.market_analysis || '',
-              news_from: news.news_from || '未知来源'  // 需要确保有默认值
+              news_from: news.news_from || '未知来源'
             };
           };
 
-          // 如果是重要新闻模式，确保所有新闻评分大于等于70
+          // 如果是重要新闻模式，过滤评分大于等于70的新闻
           const filteredData = viewMode === 'important'
-            ? data.filter(news => news.news_pingfen >= 70)
-            : data;
+            ? newsData.filter((news: NewsItem) => news.news_pingfen >= 70)
+            : newsData;
 
           if (pageNum === 1) {
             setNewsList(filteredData.map(processNews));
@@ -119,7 +123,7 @@ function App() {
           console.error('获取新闻失败:', error);
           setLoading(false);
         });
-    }, [viewMode]); // 添加 viewMode 作为依赖项
+    }, [viewMode]);
   
     // 修改 handleRefresh 以重置页码
     const handleRefresh = React.useCallback(() => {
