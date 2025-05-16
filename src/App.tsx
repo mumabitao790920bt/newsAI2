@@ -24,6 +24,9 @@ interface NewsItem {
   showAnalysis?: boolean;
 }
 
+// Worker API URL
+const WORKER_URL = "https://news-timeline-clone.mumabitao790920bt.workers.dev";
+
 function App() {
   const [newsList, setNewsList] = React.useState<NewsItem[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -67,8 +70,8 @@ function App() {
   
     const fetchNews = React.useCallback((pageNum: number = 1) => {
       setLoading(true);
-      // 使用 Cloudflare Worker API 端点
-      const apiUrl = `/api/news?page=${pageNum}`;
+      // 使用完整的 Worker API URL，添加类型参数
+      const apiUrl = `${WORKER_URL}/api/news?page=${pageNum}&type=${viewMode === 'important' ? 'important' : 'all'}`;
   
       fetch(apiUrl)
         .then(res => res.json())
