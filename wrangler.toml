@@ -2,6 +2,3 @@ name = "news-timeline-clone"
 compatibility_date = "2025-05-16"
 
 main = "./worker.js"
-
-[site]
-bucket = "./dist"
