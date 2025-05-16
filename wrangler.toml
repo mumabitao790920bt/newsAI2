@@ -1,9 +1,7 @@
 name = "news-timeline-clone"
 compatibility_date = "2025-05-16"
 
-# 删除错误的 build 配置
-# 删除错误的 routes 配置
+main = "./worker.js"
 
-# 添加正确的静态资产配置
 [site]
 bucket = "./dist"
