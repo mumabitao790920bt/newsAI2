@@ -1,0 +1,5 @@
+name = "news-timeline-clone"
+compatibility_date = "2025-05-16"
+
+[site]
+bucket = "./dist"
