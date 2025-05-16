@@ -34,7 +34,7 @@ const pool = mysql.createPool({
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://newsnw-ai-2.pages.dev'],
+  origin: ['http://localhost:5173', 'https://newsai2.pages.dev'],
   credentials: true
 }));
 app.use(express.json());
