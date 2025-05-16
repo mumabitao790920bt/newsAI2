@@ -1,7 +1,10 @@
 name = "news-timeline-clone"
 compatibility_date = "2025-05-16"
 
-main = "./dist/worker.js"
+[build]
+command = "npm run build"
+dist = "dist"
 
-[assets]
-bucket = "./dist"
+[[routes]]
+pattern = "/*"
+handler = "index"
