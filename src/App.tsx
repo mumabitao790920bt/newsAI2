@@ -24,8 +24,8 @@ interface NewsItem {
   showAnalysis?: boolean;
 }
 
-// Worker API URL
-const WORKER_URL = "https://news-timeline-clone.16318015.workers.dev";
+// API URL（使用 ainews.xin 的子域名）
+const API_BASE = "https://api.ainews.xin";
 
 function App() {
   const [newsList, setNewsList] = React.useState<NewsItem[]>([]);
@@ -71,7 +71,7 @@ function App() {
     const fetchNews = React.useCallback((pageNum: number = 1) => {
       setLoading(true);
       // 使用完整的 Worker API URL，添加类型参数
-      const apiUrl = `${WORKER_URL}/api/news?page=${pageNum}&type=${viewMode === 'important' ? 'important' : 'all'}`;
+      const apiUrl = `${API_BASE}/api/news?page=${pageNum}&type=${viewMode === 'important' ? 'important' : 'all'}`;
   
       fetch(apiUrl)
         .then(res => res.json())
