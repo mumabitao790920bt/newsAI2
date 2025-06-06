@@ -34,11 +34,36 @@ var worker_default = {
       });
     }
 
-        if (url.pathname === "/api/news" && request.method === "GET") {      try {        const page = parseInt(url.searchParams.get("page") || "1");        const pageSize = 20;        const offset = (page - 1) * pageSize;        const type = url.searchParams.get("type") || "all"; // 新增参数，用于区分全部新闻和重要新闻                let query;        if (type === "important") {          query = `            SELECT * FROM news_yd             WHERE news_pingfen >= 70            ORDER BY pub_date DESC             LIMIT ? OFFSET ?          `;        } else {          query = `            SELECT * FROM news_yd             ORDER BY pub_date DESC             LIMIT ? OFFSET ?          `;        }        const { results } = await env.DB.prepare(query)          .bind(pageSize, offset)          .all();
+    if (url.pathname === "/api/news" && request.method === "GET") {
+      try {
+        const page = parseInt(url.searchParams.get("page") || "1");
+        const pageSize = 20;
+        const offset = (page - 1) * pageSize;
+        const type = url.searchParams.get("type") || "all";
+
+        let query;
+        if (type === "important") {
+          query = `
+            SELECT * FROM news_yd 
+            WHERE news_pingfen >= 70
+            ORDER BY pub_date DESC 
+            LIMIT ? OFFSET ?
+          `;
+        } else {
+          query = `
+            SELECT * FROM news_yd 
+            ORDER BY pub_date DESC 
+            LIMIT ? OFFSET ?
+          `;
+        }
+
+        const result = await env.DB.prepare(query)
+          .bind(pageSize, offset)
+          .all();
 
         return new Response(JSON.stringify({
           success: true,
-          data: results
+          data: result.results
         }), {
           headers: {
             "Content-Type": "application/json",

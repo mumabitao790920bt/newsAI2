@@ -32,7 +32,7 @@ function App() {
   const [loading, setLoading] = React.useState(true);
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
-  const [viewMode, setViewMode] = React.useState<'timeline' | 'important'>('timeline');  // 添加视图模式状态
+  const [viewMode, setViewMode] = React.useState<'timeline' | 'important' | 'daily-important'>('timeline');  // 添加新的视图模式状态
 
   const formatDateTime = (dateStr: string) => {
       const date = new Date(dateStr);
@@ -70,9 +70,19 @@ function App() {
   
     const fetchNews = React.useCallback((pageNum: number = 1) => {
       setLoading(true);
-      // 使用完整的 Worker API URL，添加类型参数
-      const apiUrl = `${API_BASE}/api/news?page=${pageNum}&type=${viewMode === 'important' ? 'important' : 'all'}`;
-  
+      // 使用完整的 Worker API URL，添加类型参数和页码大小
+      let apiUrl = `${API_BASE}/api/news?page=${pageNum}`;
+      let current_pageSize = 20; // 默认每页20条
+
+      if (viewMode === 'important') {
+        apiUrl += `&type=important`;
+      } else if (viewMode === 'daily-important') {
+        apiUrl += `&type=daily_important`;
+        current_pageSize = 6; // 当日重要新闻每页6条
+      }
+      
+      apiUrl += `&pageSize=${current_pageSize}`;
+
       fetch(apiUrl)
         .then(res => res.json())
         .then((response) => {
@@ -110,8 +120,11 @@ function App() {
           };
 
           // 如果是重要新闻模式，过滤评分大于等于70的新闻
+          // 如果是当日重要新闻模式，过滤评分大于等于80的新闻 (后端处理时间过滤)
           const filteredData = viewMode === 'important'
             ? newsData.filter((news: NewsItem) => news.news_pingfen >= 70)
+            : viewMode === 'daily-important'
+            ? newsData.filter((news: NewsItem) => news.news_pingfen >= 80) // 前端保留评分过滤作为补充
             : newsData;
 
           if (pageNum === 1) {
@@ -119,7 +132,8 @@ function App() {
           } else {
             setNewsList(prev => [...prev, ...filteredData.map(processNews)]);
           }
-          setHasMore(filteredData.length === 20);
+          // 根据当前模式判断是否有更多数据
+          setHasMore(filteredData.length === current_pageSize);
           setLoading(false);
         })
         .catch(error => {
@@ -186,6 +200,21 @@ function App() {
         >
           重要新闻排序速递
         </button>
+        {/* 新增当日重要新闻按钮 */}
+        <button
+          onClick={() => {
+            setViewMode('daily-important');
+            setPage(1);
+            fetchNews(1);
+          }}
+          className={`px-6 py-2 rounded-full transition-colors ${
+            viewMode === 'daily-important'
+              ? 'bg-[#4870ae] text-white'
+              : 'bg-[#3c5476]/50 text-gray-300 hover:bg-[#3c5476]/70'
+          }`}
+        >
+          当日重要新闻
+        </button>
       </div>
 
       <main className="flex-1 w-full flex flex-col items-center">
@@ -193,24 +222,24 @@ function App() {
           className={`mt-16 w-full max-w-[600px] flex flex-col rounded-2xl shadow-xl ${
             viewMode === 'timeline' 
               ? 'bg-[#3c5476]/90' 
-              : 'bg-[#4c3c76]/90'  // 重要新闻模式使用紫色系
+              : viewMode === 'important' ? 'bg-[#4c3c76]/90' : 'bg-[#604090]/90' // 当日重要新闻使用不同颜色
           }`}
-          style={{ 
-            border: viewMode === 'timeline' 
+          style={{
+            border: viewMode === 'timeline'
               ? '4px solid #46638c'
-              : '4px solid #5c468c',  // 边框颜色也相应改变
+              : viewMode === 'important' ? '4px solid #5c468c' : '4px solid #7050a0', // 边框颜色
             boxShadow:'0 6px 32px 0 rgba(60,84,118,.16)' 
           }}
-          >
+        >
           <div className={`flex items-center justify-between px-4 pt-3 pb-2 rounded-t-2xl border-b ${
             viewMode === 'timeline'
               ? 'bg-[#4870ae]/70 border-[#46638c]/70'
-              : 'bg-[#6848ae]/70 border-[#5c468c]/70'  // 头部背景色也改变
+              : viewMode === 'important' ? 'bg-[#6848ae]/70 border-[#5c468c]/70' : 'bg-[#8050b0]/70 border-[#7050a0]/70' // 头部背景色
           }`}>
             <div className="flex items-center">
               <img alt="新闻时间线速递" src="https://ext.same-assets.com/1849582332/3218743151.png" className="w-8 h-8 rounded-full bg-white shadow mr-2"/>
               <div className="text-white font-bold text-xl tracking-wide">
-                {viewMode === 'timeline' ? '新闻时间线速递' : '重要新闻速递'}
+                {viewMode === 'timeline' ? '新闻时间线速递' : viewMode === 'important' ? '重要新闻速递' : '当日重要新闻'}
               </div>
               <div className="ml-3 bg-blue-100/60 text-blue-800 px-2 py-0.5 text-xs rounded">
                 AI专业解读：让每个人都读懂新闻背后的影响
@@ -221,7 +250,7 @@ function App() {
             <div className="text-xs text-white/70 px-5 pt-2 pb-1">
               {viewMode === 'timeline' 
                 ? ''
-                : ''}
+                : viewMode === 'important' ? '' : ''}
             </div>
             <div className="flex items-center gap-4 text-gray-300/70 text-lg">
               <button 
